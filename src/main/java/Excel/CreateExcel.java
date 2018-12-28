@@ -1,5 +1,6 @@
 package Excel;
 
+import JDBC.connectDB;
 import com.account.Account;
 import com.account.AccountService;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -15,8 +16,8 @@ public class CreateExcel {
 
     static String FileName = "NewExcel.xls";
     static String FileDir = "C:/Users/admin/Desktop/";
-    final static int RowSize = 10;
-    final static int CellSize = 10;
+    final static int RowSize = 15;
+    final static int CellSize = 15;
     AccountService accountService;
     Row row[];
     Cell cell[][];
@@ -51,7 +52,7 @@ public class CreateExcel {
         make();
     }
 
-    public void grid(){
+    public void grid() {
         useCommand();
         sheet.addMergedRegion(new CellRangeAddress(0,0,0,4));
         sheet.addMergedRegion(new CellRangeAddress(0,0,5,6));
@@ -111,6 +112,14 @@ public class CreateExcel {
         cell[2 + accountService.logIndex][5].setCellValue(accountService.findAccount("A").getBalance());
         sheet.addMergedRegion(new CellRangeAddress(2+ accountService.logIndex,2+ accountService.logIndex,7,8));
         cell[2 + accountService.logIndex][7].setCellValue(accountService.findAccount("B").getBalance());
+
+
+        connectDB cd = new connectDB();
+        cd.init();
+        String b[] = cd.getA();
+        cell[13][13].setCellValue(b[0]);
+        cell[13][14].setCellValue(b[1]);
+
     }
 
     public void make() {
@@ -141,5 +150,4 @@ public class CreateExcel {
         accountService.credit(a,5000);
         accountService.transfer(a,b,3000);
     }
-
 }
