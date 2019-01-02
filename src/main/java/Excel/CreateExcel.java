@@ -1,16 +1,25 @@
 package Excel;
 
 import JDBC.connectDB;
+import Json.JsonTest;
 import com.account.Account;
 import com.account.AccountService;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public class CreateExcel {
 
@@ -38,21 +47,56 @@ public class CreateExcel {
             for(int j = 0 ; j< CellSize; j++) {
                 cell[i][j] = row[i].createCell(j);
                 // 스타일은 셀 생성 이후에 가능한 것입니다.
-                style[i][j] = cell[i][j].getCellStyle();
-                style[i][j].setWrapText(true);
-                cell[i][j].setCellStyle(style[i][j]);
+//                style[i][j] = cell[i][j].getCellStyle();
+//                style[i][j].setWrapText(true);
+//                cell[i][j].setCellStyle(style[i][j]);
+                // 셀 크기 알맞게 수정해야함. 자동으로 맞춰주는 것은 한계가 있음. 높이 넓이를 둘다 맞추는 것이 아님.
+                sheet.setColumnWidth(i*15 + j,(sheet.getColumnWidth(i*15+j)+(short)1024 * 5));
 
             }
         }
 
         // 내용 채워넣고 그리는 부분.
-        grid();
+        bookinfogrid();
 
         //쓴 메소드를 통해 Excel 파일 생성.
         make();
     }
 
-    public void grid() {
+    public void bookinfogrid(){
+        JsonTest jt = new JsonTest();
+        try {
+            jt.dataFromOpenApi();
+            JSONParser jsonParser = new JSONParser();
+            JSONObject jsonObj = (JSONObject) jsonParser.parse(jt.sb.toString());
+            JSONArray itemsArray = (JSONArray) jsonObj.get("items");
+            for(int i=0; i<itemsArray.size(); i++)
+            {
+                JSONObject tempObj = (JSONObject) itemsArray.get(i);
+                Set<String> s = tempObj.keySet();
+                Iterator<String> it = s.iterator();
+
+                int n = 0;
+                while(it.hasNext()){
+                    cell[i][n].setCellValue(tempObj.get(it.next()).toString());
+                    n++;
+                }
+
+
+//                for(int j=0; j<tempObj.size(); j++){
+//                    cell[i][j].setCellValue(tempObj.get(it.hasNext()).toString());
+//                }
+
+            }
+        } catch (ParseException e) {}catch (Exception e){}
+
+
+
+
+    }
+
+
+    public void Accountgrid() {
         useCommand();
         sheet.addMergedRegion(new CellRangeAddress(0,0,0,4));
         sheet.addMergedRegion(new CellRangeAddress(0,0,5,6));
