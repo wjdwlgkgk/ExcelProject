@@ -1,0 +1,264 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace = "sample">
+
+    <select id = "rslt" resultType="hashmap">
+        select * from chk_grp_oval_rslt
+    </select>
+
+
+
+    <select id="chkgrpwork" resultType="hashmap">
+        select * from chk_grp_work
+    </select>
+
+    <select id="chkgrprslt" resultType="hashmap">
+        select * from chk_grp_rslt order by chk_grp_rslt.rslt_seq desc
+    </select>
+
+    <select id="cvss" resultType="hashmap">
+        select * from nvd_cvss order by nvd_cvss.score desc
+    </select>
+
+    <select id="selectScanGroup" resultType="Hashmap" useCache="false">
+        SELECT mngt.chk_grp_seq AS groupSeq
+              , mngt.chk_grp_nm AS groupNm
+              , count(chkGrpVm.chk_vm_seq) AS groupCount
+          FROM
+                chk_grp_mngt AS mngt
+          JOIN
+                chk_grp_vm_map AS chkGrpVm
+            ON
+                mngt.chk_grp_seq = chkGrpVm.chk_grp_seq
+           AND
+                mngt.del_yn = 'N'
+          JOIN
+                chk_vm AS chkVm
+            ON
+                chkGrpVm.chk_vm_seq = chkVm.chk_vm_seq
+           AND
+                chkVm.del_yn = 'N'
+          JOIN
+                mastr_vm AS mstVm
+            ON
+                chkVm.mastr_vm_seq = mstVm.mastr_vm_seq
+           AND
+                mstVm.del_yn = 'N'
+          JOIN
+                comp_mngt AS comp
+            ON
+                mstVm.comp_seq = comp.comp_seq
+           AND
+                comp.use_yn = 'Y'
+     GROUP BY
+                mngt.chk_grp_seq
+    </select>
+
+
+    <select id = "selectChk" resultType="HashMap" useCache="false">
+        select
+  mngt.cve_id
+     ,   sumary
+     ,   cvss.score
+     ,   aff.wfn_parts
+     ,   aff.wfn_vendor
+     ,   aff.wfn_product
+     ,   case when aff.wfn_parts::text not like '%a%' and aff.wfn_product::text like '%windows_10%'
+                then 'O'
+  end as window_10
+
+     ,   case when aff.wfn_parts::text not like '%a%' and aff.wfn_product::text like '%windows_7%'
+                then 'O'
+  end as window_7
+     ,   case when aff.wfn_parts::text not like '%a%' and aff.wfn_product::text like '%windows_8%'
+                then 'O'
+  end as window_8
+
+     ,   case when aff.wfn_parts::text not like '%a%' and aff.wfn_product::text like '%windows_8.1%'
+                then 'O'
+  end as "window_8_1"
+
+     ,   case when aff.wfn_parts::text not like '%a%' and aff.wfn_product::text like '%windows_server_2008%'
+                then 'O'
+  end as windows_server_2008
+
+       ,   case when aff.wfn_parts::text not like '%a%' and aff.wfn_product::text like '%windows_server_2012%'
+                  then 'O'
+    end as windows_server_2012
+       ,   case when aff.wfn_parts::text not like '%a%' and aff.wfn_product::text like '%windows_server_2016%'
+                  then 'O'
+    end as windows_server_2016
+
+  ,   case when aff.wfn_parts::text not like '%a%' and aff.wfn_product::text like '%centos%'
+            then 'O'
+      end as centos
+     ,   case when aff.wfn_parts::text not like '%a%'
+                      and aff.wfn_product::text like '%ubuntu_linux%'
+                      and aff.wfn_version::text like '%18.04%'
+                then 'O'
+  end as "ubuntu_linux_18.04"
+     ,   case when aff.wfn_parts::text not like '%a%'
+
+  and aff.wfn_product::text like '%ubuntu_linux%'
+  and aff.wfn_version::text like '%16.04%'
+                then 'O'
+  end as "ubuntu_linux_16.04"
+
+     ,   case when aff.wfn_parts::text not like '%a%'
+  and aff.wfn_product::text like '%ubuntu_linux%'
+  and aff.wfn_version::text like '%14.04%'
+                then 'O'
+  end as "ubuntu_linux_14.04"
+
+
+
+       ,   oval.*
+from nvd_cve_list_mngt mngt
+       inner join nvd_cvss cvss
+                  on mngt.cve_id = cvss.cve_id
+       left outer join (
+  select
+    cve_id
+       ,array_agg(wfn_part) as wfn_parts
+       ,array_agg(wfn_vendor) as wfn_vendor
+       ,array_agg(wfn_product) as wfn_product
+       ,array_agg(wfn_version) as wfn_version
+
+  from nvd_vuln_affed
+  group by cve_id
+) aff
+                       on aff.cve_id = mngt.cve_id
+       left outer join (
+  select
+    o_ref.ref_id as cve_id
+  from oval_def def
+         inner join oval_ref o_ref
+                    on def.oval_id = o_ref.oval_id
+  where o_ref.source = 'CVE'
+  group by o_ref.ref_id
+) oval
+                       on mngt.cve_id = oval.cve_id
+order by mngt.cve_id  desc
+
+    </select>
+
+
+    <select id="selectChk2" resultType="HashMap" useCache="false">
+        select
+  mngt.cve_id
+     ,   sumary
+     ,   cvss.score
+     ,   aff.wfn_parts
+     ,   aff.wfn_vendor
+     ,   aff.wfn_product
+     ,   case when aff.wfn_parts::text not like '%a%' and aff.wfn_product::text like '%windows_10%'
+                then 'O'
+  end as window_10
+
+     ,   case when aff.wfn_parts::text not like '%a%' and aff.wfn_product::text like '%windows_7%'
+                then 'O'
+  end as window_7
+     ,   case when aff.wfn_parts::text not like '%a%' and aff.wfn_product::text like '%windows_8%'
+                then 'O'
+  end as window_8
+
+     ,   case when aff.wfn_parts::text not like '%a%' and aff.wfn_product::text like '%windows_8.1%'
+                then 'O'
+  end as "window_8_1"
+
+     ,   case when aff.wfn_parts::text not like '%a%' and aff.wfn_product::text like '%windows_server_2008%'
+                then 'O'
+  end as windows_server_2008
+
+     ,   case when aff.wfn_parts::text not like '%a%' and aff.wfn_product::text like '%windows_server_2012%'
+                then 'O'
+  end as windows_server_2012
+     ,   case when aff.wfn_parts::text not like '%a%' and aff.wfn_product::text like '%windows_server_2016%'
+                then 'O'
+  end as windows_server_2016
+
+     ,   case when aff.wfn_parts::text not like '%a%' and aff.wfn_product::text like '%centos%'
+                then 'O'
+  end as centos
+     ,   case when aff.wfn_parts::text not like '%a%'
+  and aff.wfn_product::text like '%ubuntu_linux%'
+  and aff.wfn_version::text like '%18.04%'
+                then 'O'
+  end as "ubuntu_linux_18.04"
+     ,   case when aff.wfn_parts::text not like '%a%'
+
+  and aff.wfn_product::text like '%ubuntu_linux%'
+  and aff.wfn_version::text like '%16.04%'
+                then 'O'
+  end as "ubuntu_linux_16.04"
+
+     ,   case when aff.wfn_parts::text not like '%a%'
+  and aff.wfn_product::text like '%ubuntu_linux%'
+  and aff.wfn_version::text like '%14.04%'
+                then 'O'
+  end as "ubuntu_linux_14.04"
+
+, case when aff.wfn_vendor::text like '%apache%'
+          and aff.wfn_product::text like '%http_server%'
+        then 'O'
+  end as "apache_http_server"
+
+
+, case when aff.wfn_vendor::text like '%microsoft%'
+  and aff.wfn_product::text like '%sql_server%'
+              then 'O'
+  end as "microsoft_sql_server"
+
+, case when aff.wfn_vendor::text like '%mysql%'
+  and aff.wfn_product::text like '%mysql%'
+              then 'O'
+  end as "mysql_mysql"
+
+, case when aff.wfn_vendor::text like '%oracle%'
+  and aff.wfn_product::text like '%mysql%'
+              then 'O'
+  end as "oracle_mysql"
+
+     , case when aff.wfn_vendor::text like '%apache%'
+  and aff.wfn_product::text like '%tomcat%'
+              then 'O'
+  end as "apache_tomcat"
+
+     , case when aff.wfn_vendor::text like '%redislabs%'
+  and aff.wfn_product::text like '%redis%'
+              then 'O'
+  end as "redislabs_redis"
+
+
+     ,   oval.*
+from nvd_cve_list_mngt mngt
+       inner join nvd_cvss cvss
+                  on mngt.cve_id = cvss.cve_id
+       left outer join (
+  select
+    cve_id
+       ,array_agg(wfn_part) as wfn_parts
+       ,array_agg(wfn_vendor) as wfn_vendor
+       ,array_agg(wfn_product) as wfn_product
+       ,array_agg(wfn_version) as wfn_version
+
+  from nvd_vuln_affed
+  group by cve_id
+) aff
+                       on aff.cve_id = mngt.cve_id
+       left outer join (
+  select
+    o_ref.ref_id as cve_id
+  from oval_def def
+         inner join oval_ref o_ref
+                    on def.oval_id = o_ref.oval_id
+  where o_ref.source = 'CVE'
+  group by o_ref.ref_id
+) oval
+                       on mngt.cve_id = oval.cve_id
+order by mngt.cve_id  desc
+    </select>
+
+</mapper>

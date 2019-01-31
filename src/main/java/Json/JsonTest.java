@@ -18,7 +18,7 @@ public class JsonTest{
         String clientID = "1jD9knj7DoCLGvKxQYFh";
         String clientSecret = "lWul1byORz";
         String title = "love";
-        int displaynum = 5;
+        int displaynum = 100;
         int startnum = 1;
         URL url = new URL("https://openapi.naver.com/v1/search/book_adv.json?d_titl=" + title + "&display=" + displaynum);
         //url 상세검색 =  book_adv, 그냥 검색 book

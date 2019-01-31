@@ -4,9 +4,10 @@ import JDBC.connectDB;
 import Json.JsonTest;
 import com.account.Account;
 import com.account.AccountService;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -23,24 +24,25 @@ import java.util.Set;
 
 public class CreateExcel {
 
-    static String FileName = "NewExcel.xls";
+    static String FileName = "NewExcel.xlsx";
     static String FileDir = "C:/Users/admin/Desktop/";
-    final static int RowSize = 15;
-    final static int CellSize = 15;
+    static String title[] = {"cve_id", "sumary", "score", "wfn_parts", "wfn_vendor", "wfn_product", "window_10", "window_7", "window_8", "window_8.1", "windows_server_2008", "windows_server_2012", "centos", "ubuntu_linux_18.04", "ubuntu_linux_16.04", "cve_id"};
+    final static int RowSize = 1000;
+    final static int CellSize = title.length;
     AccountService accountService;
-    Row row[];
-    Cell cell[][];
-    CellStyle style[][];
-    Workbook xlsWB;
-    Sheet sheet;
+    XSSFRow row[];
+    XSSFCell cell[][];
+    XSSFCellStyle style[][];
+    XSSFWorkbook WB;
+    XSSFSheet sheet;
 
     public void makeExcelFile(){
         //생성
-        xlsWB = new HSSFWorkbook();
-        sheet= xlsWB.createSheet("firstSheet");
-        row = new Row[RowSize];
-        cell = new Cell[RowSize][CellSize];
-        style = new CellStyle[RowSize][CellSize];
+        WB = new XSSFWorkbook();
+        sheet= WB.createSheet("firstSheet");
+        row = new XSSFRow[RowSize];
+        cell = new XSSFCell[RowSize][CellSize];
+        style = new XSSFCellStyle[RowSize][CellSize];
         for(int i = 0 ; i< RowSize; i++)
         {
             row[i] = sheet.createRow(i);
@@ -57,10 +59,33 @@ public class CreateExcel {
         }
 
         // 내용 채워넣고 그리는 부분.
-        bookinfogrid();
+        DBGrid();
+        //bookinfogrid();s
+        //Accountgrid();
+
 
         //쓴 메소드를 통해 Excel 파일 생성.
         make();
+    }
+
+    public void DBGrid(){
+        //JDBC를 활용한 localhostDB 데이터 추출 후 Excel 출력.
+        connectDB cd = new connectDB();
+        cd.init();
+        String b[][] = cd.getA();
+
+
+        for(int j=0; j<CellSize; j++) {
+            cell[0][j].setCellValue(title[j]);
+        }
+
+        for(int i = 0; i<RowSize; i++)
+        {
+            for(int j=0; j<CellSize; j++) {
+                cell[1+i][j].setCellValue(b[i][j]);
+            }
+        }
+
     }
 
     public void bookinfogrid(){
@@ -94,7 +119,6 @@ public class CreateExcel {
 
 
     }
-
 
     public void Accountgrid() {
         useCommand();
@@ -156,22 +180,14 @@ public class CreateExcel {
         cell[2 + accountService.logIndex][5].setCellValue(accountService.findAccount("A").getBalance());
         sheet.addMergedRegion(new CellRangeAddress(2+ accountService.logIndex,2+ accountService.logIndex,7,8));
         cell[2 + accountService.logIndex][7].setCellValue(accountService.findAccount("B").getBalance());
-
-
-        connectDB cd = new connectDB();
-        cd.init();
-        String b[] = cd.getA();
-        cell[13][13].setCellValue(b[0]);
-        cell[13][14].setCellValue(b[1]);
-
     }
 
     public void make() {
         try {
             File xlsFile = new File(FileDir+FileName);
             FileOutputStream fileout = new FileOutputStream(xlsFile);
-            xlsWB.write(fileout); //이 부분 필요스.
-
+            WB.write(fileout); //이 부분 필요스.
+            fileout.close();
         }catch(FileNotFoundException e){
             e.printStackTrace();
         }catch (IOException e) {
