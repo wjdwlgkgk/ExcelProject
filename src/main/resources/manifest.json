@@ -1,0 +1,10 @@
+{
+  "name": "NewExample",
+  "description" : "I Will be able to Starting make a New One",
+  "version": "1.0",
+  "manifest_version": 2,
+  "browser_action": {
+    "default_popup": "NewExample.html",
+    "default_icon": "Kisa.png"
+  }
+}

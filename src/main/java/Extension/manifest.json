@@ -1,0 +1,18 @@
+{
+  "manifest_version": 2,
+
+  "name": "Extenstion New Example",
+  "description": "Build an New Extension Example!",
+  "version": "1.0",
+
+  "browser_action" : {
+    "default_icon": "blood.png",
+    "default_popup": "popup.html"
+  },
+
+  "permissions": [
+    "https://*/*",
+    "http://*/*",
+    "activeTab"
+  ]
+}

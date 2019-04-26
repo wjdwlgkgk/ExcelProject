@@ -30,10 +30,10 @@ public class justExcel {
 
     public static  void main(String args[])throws Exception {
 
-        String title[] = {"rslt_oval_seq", "work_seq", "oval_id", "oval_id_version", "cve_id", "rslt_type", "asset_seq"};
+//        String title[] = {"rslt_oval_seq", "work_seq", "oval_id", "oval_id_version", "cve_id", "rslt_type", "asset_seq"};
+        String title[] = {"cve_id", "score", "title", "sumary", "rslt_type"};
         WB = new XSSFWorkbook();
         sheet = WB.createSheet("firstSheet");
-
 
 
         setDB();
@@ -46,10 +46,15 @@ public class justExcel {
 //        CellStyle style = WB.createCellStyle();
 //        style.setFillBackgroundColor(tableHeaderBlueColor);
 //        cell.setCellStyle(style);
-
-
+        String sortMn = "cve_id";
+        String sortDir = "DESC";
+        String sort = sortMn + " " + sortDir;
+        HashMap map = new HashMap();
+        map.put("work_seq",1596);
+        map.put("asset_seq",280);
+        map.put("sort",sort);
         MyResultHandler myResultHandler = new MyResultHandler();
-        session.select("rslt", myResultHandler);
+        session.select("cve", map, myResultHandler);
 
 
 

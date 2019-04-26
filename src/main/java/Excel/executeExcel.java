@@ -35,14 +35,13 @@ public class executeExcel {
         ArrayList<ArrayList<XSSFCellStyle>> style = new ArrayList<ArrayList<XSSFCellStyle>>();
         int rownum = 0;
         int cellnum = 0;
-        final HashMap[] hashMap = {new HashMap()};
 
         setDB();
 
         MyResultHandler myResultHandler = new MyResultHandler();
-        session.select("selectChk2", myResultHandler);
-
-
+//        List<HashMap> list = session.select("cve", myResultHandler);
+//
+//
 //        for(int kk=0; kk<myResultHandler.maps.size(); kk++)
 //        {
 //            row.add(sheet.createRow(kk));
@@ -73,71 +72,22 @@ public class executeExcel {
 //            rownum++;
 //        }
 
-//        XSSFRow[] Arow = new XSSFRow[RowSize];
-//        XSSFCell[][] Acell = new XSSFCell[RowSize][CellSize];
-//        for (int i = 0; i < RowSize; i++) {
-//            row[i] = sheet.createRow(i);
-//            for (int j = 0; j < CellSize; j++)
-//                cell[i][j] = row[i].createCell(j);
-//        }
-
-//        try {
-//            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-//            Connection con = DriverManager.getConnection(connectionUrl, "sa", "!tlzb001");
-//            Statement stmt = con.createStatement();
-//
-//            String sql;
-//            sql = "select top " + 350000 + " * from ssm_chkresultitem";
-//            stmt.getResultSet();
-//            ResultSet rs = stmt.executeQuery(sql);
-
-//            while (rs.next()) {
-//                Arow[num] = sheet.createRow(num);
-//                for(int i=0; i< CellSize; i++)
-//                Acell[num][i] = Arow[num].createCell(i);
-//                Acell[num][0].setCellValue(rs.getString("RESULTITEM_SEQ"));
-//                Acell[num][1].setCellValue(rs.getString("jobid"));
-//                Acell[num][2].setCellValue(rs.getString("hw_seq"));
-//                Acell[num][3].setCellValue(rs.getString("map_id"));
-//                Acell[num][4].setCellValue(rs.getString("RESULT_SEQ"));
-//                Acell[num][5].setCellValue(rs.getString("EXCEPTION_YN"));
-//                Acell[num][6].setCellValue(rs.getString("item"));
-//                Acell[num][7].setCellValue(rs.getString("message"));
-//                num++;
-
-//                row.add(sheet.createRow(num));
-//                for(int i=0; i<title.length; i++) {
-//                    cell.add(i, row.get(num).createCell(i));
-//                }
-//                    cells.add(cell);
-//                    for(int i=0; i<title.length; i++) {
-//                    cell.get(i).setCellValue(rs.getString(title[i]));
-//                }
-//                num++;
-//            }
-//            rs.close();
-//            stmt.close();
-//            con.close();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        try {
-//            File xlsFile = new File(FileDir + FileName);
-//            fileout = new FileOutputStream(xlsFile);
-//            WB.write(fileout); //이 부분 필요스.
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            try {
-//                fileout.flush();
-//                fileout.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
+        try {
+            File xlsFile = new File(FileDir + FileName);
+            fileout = new FileOutputStream(xlsFile);
+            WB.write(fileout); //이 부분 필요스.
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                fileout.flush();
+                fileout.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private static void setDB() throws IOException {

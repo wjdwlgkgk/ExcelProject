@@ -9,6 +9,8 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
 import org.apache.poi.xssf.usermodel.extensions.XSSFCellBorder;
 import org.omg.CORBA.WrongTransactionHolder;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetView;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.STSheetViewType;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -29,9 +31,8 @@ public class NewExecuteExcel {
 
         XSSFWorkbook WB = new XSSFWorkbook();
         XSSFSheet sheet = WB.createSheet("firstSheet");
-
-
-
+        CTSheetView view = sheet.getCTWorksheet().getSheetViews().getSheetViewArray(0);
+        view.setView(STSheetViewType.PAGE_BREAK_PREVIEW);
 
         Row row = sheet.createRow(2);
 
@@ -77,7 +78,7 @@ public class NewExecuteExcel {
         cell.setCellValue("안녕나는-12345687-asdfasdk야호!");
 
 
-        for(int i=0; i<1000000; i++)
+        for(int i=0; i<10; i++)
         {
             row = sheet.createRow(i);
             cell = row.createCell(0);
@@ -85,6 +86,11 @@ public class NewExecuteExcel {
             cell.setCellStyle(style);
         }
         //"RESULTITEM_SEQ", "jobid", "hw_seq", "map_id", "RESULT_SEQ", "EXCEPTION_YN", "item", "message"
+
+
+        sheet.setSelected(true);
+
+        sheet = WB.createSheet("firstSheet");
 
 
 

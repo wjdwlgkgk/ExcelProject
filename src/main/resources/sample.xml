@@ -4,6 +4,31 @@
 
 <mapper namespace = "sample">
 
+    <select id="cve" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+       select
+      rslt.cve_id
+    , ROUND(nvd.score) AS score
+    , def.title
+    , nvd_cve_list_mngt.sumary
+    , CASE WHEN rslt.rslt_type = 'true' THEN '취약'
+--            WHEN rslt.rslt_type = 'false' THEN '양호'
+           WHEN rslt.rslt_type = 'error' THEN '인포'
+           WHEN rslt.rslt_type = 'not applicable' THEN '인포' END rslt_type
+    from chk_grp_oval_rslt rslt
+      inner join oval_def def
+        on rslt.oval_id = def.oval_id
+      inner join nvd_cvss nvd
+        on nvd.cve_id = rslt.cve_id
+      inner join nvd_cve_list_mngt
+        on nvd_cve_list_mngt.cve_id = rslt.cve_id
+    where work_seq = #{work_seq}
+    and rslt.rslt_type != 'false'
+    and asset_seq = #{asset_seq}
+    and rslt.cve_id is not null
+    ORDER BY #{sort};
+   </select>
+
+
     <select id = "rslt" resultType="hashmap">
         select * from chk_grp_oval_rslt
     </select>
